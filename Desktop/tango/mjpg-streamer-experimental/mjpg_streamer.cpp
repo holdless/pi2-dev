@@ -67,7 +67,8 @@ pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 I2C i2c;
 
 
-
+// 2017.3.3 hiroshi: define/not define mirror image
+//#define _MIRROR
 
 void error(const char *msg)
 {
@@ -143,11 +144,11 @@ static void *tcp_server(void *arg)
 	else if (strcmp(buffer, "UL") == 0)
 	    i2c.send("5");
 	else if (strcmp(buffer, "UR") == 0)
-	    i2c.send("5");
+	    i2c.send("6");
 	else if (strcmp(buffer, "DL") == 0)
-	    i2c.send("5");
+	    i2c.send("7");
 	else if (strcmp(buffer, "DR") == 0)
-	    i2c.send("5");
+	    i2c.send("8");
 	else
 	    i2c.send("0");
 
@@ -379,15 +380,15 @@ int main(int argc, char *argv[])
     }
 
     // 704.4.0126 hiroshi: init GoogleNet Obj-rec object
-    IhsorihGoogLeNetObjectRecognizer objRec;
-    if (!objRec.init("_GoogleNet/bvlc_googlenet.prototxt",
-                             "_GoogleNet/bvlc_googlenet.caffemodel",
-                             "_GoogleNet/synset_words.txt")) {
-#ifdef _SHOW_DBG
-        DBG("\n\n\n\ cannot init GoogleNet Obj-rec! n\n\n");
-#endif
-        return 1;
-    }
+//    IhsorihGoogLeNetObjectRecognizer objRec;
+//    if (!objRec.init("_GoogleNet/bvlc_googlenet.prototxt",
+//                             "_GoogleNet/bvlc_googlenet.caffemodel",
+//                             "_GoogleNet/synset_words.txt")) {
+//#ifdef _SHOW_DBG
+//        DBG("\n\n\n\ cannot init GoogleNet Obj-rec! n\n\n");
+//#endif
+//        return 1;
+//    }
 
     /* parameter parsing */
     while(1) {
@@ -638,16 +639,18 @@ int main(int argc, char *argv[])
         memcpy (image.ptr<uchar> ( 0 ), global.buf, global.size);
         cvtColor(image, image, COLOR_RGB2BGR);
         flip(image, image, 0);
-
+#ifndef _MIRROR
+        flip(image, image, 1);
+#endif
         // 704.4.0126 hiroshi: GoogleNet Obj-rec
-        objRec.setImage(image);
+//        objRec.setImage(image);
 //        objRec.predict();
 //        objRec.putProbBar(image);
-        imshow("GoogleNet Obj-rec", image);
+//        imshow("GoogleNet Obj-rec", image);
 
         // << opencv face detection
-//        detectFace(image);
-//        imshow("face-detection", image);
+        detectFace(image);
+        imshow("face-detection", image);
         // opencv face-detection >>
 
         cvtColor(image, image, COLOR_BGR2RGB);
